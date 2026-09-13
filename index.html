@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍽️ Ne Yesem?</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #fff7ed;
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #ff7a18, #ffb347);
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      border-radius: 0 0 30px 30px;
+    }
+
+    header h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 18px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      color: #f26b21;
+      margin-bottom: 20px;
+    }
+
+    .ingredients {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .ingredient {
+      border: 2px solid #eee;
+      padding: 18px 10px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      background: white;
+      user-select: none;
+    }
+
+    .ingredient:hover {
+      transform: translateY(-3px);
+      border-color: #ff8a3d;
+    }
+
+    .ingredient.selected {
+      background: #fff0e5;
+      border-color: #ff7518;
+      box-shadow: 0 0 0 2px rgba(255,117,24,0.15);
+    }
+
+    .ingredient span {
+      display: block;
+      font-size: 34px;
+      margin-bottom: 7px;
+    }
+
+    button {
+      border: none;
+      background: #ff7518;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #e85f08;
+      transform: scale(1.03);
+    }
+
+    .clear-button {
+      background: #555;
+      margin-left: 8px;
+    }
+
+    .clear-button:hover {
+      background: #333;
+    }
+
+    #results {
+      display: none;
+    }
+
+    .results-count {
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 17px;
+    }
+
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .food-card {
+      background: #fffaf6;
+      border: 2px solid #ffe1cc;
+      border-radius: 20px;
+      padding: 22px;
+      transition: 0.2s;
+    }
+
+    .food-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .food-icon {
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    .food-name {
+      color: #f26b21;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .food-info {
+      color: #777;
+      margin-bottom: 15px;
+    }
+
+    .food-ingredients {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      line-height: 1.7;
+    }
+
+    .recipe {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      line-height: 1.8;
+    }
+
+    .show-recipe {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .no-result {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+      font-size: 18px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #888;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 32px;
+      }
+
+      .container {
+        padding: 0 12px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .clear-button {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🍽️ Ne Yesem?</h1>
+  <p>Evindeki malzemeleri seç, yapabileceğin yemekleri bul!</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+
+    <h2>🏠 Evindeki tüm malzemeleri seç</h2>
+
+    <div class="ingredients">
+
+      <div class="ingredient" data-name="Makarna" onclick="selectIngredient(this)">
+        <span>🍝</span>
+        Makarna
+      </div>
+
+      <div class="ingredient" data-name="Domates" onclick="selectIngredient(this)">
+        <span>🍅</span>
+        Domates
+      </div>
+
+      <div class="ingredient" data-name="Yumurta" onclick="selectIngredient(this)">
+        <span>🥚</span>
+        Yumurta
+      </div>
+
+      <div class="ingredient" data-name="Tavuk" onclick="selectIngredient(this)">
+        <span>🍗</span>
+        Tavuk
+      </div>
+
+      <div class="ingredient" data-name="Peynir" onclick="selectIngredient(this)">
+        <span>🧀</span>
+        Peynir
+      </div>
+
+      <div class="ingredient" data-name="Patates" onclick="selectIngredient(this)">
+        <span>🥔</span>
+        Patates
+      </div>
+
+      <div class="ingredient" data-name="Soğan" onclick="selectIngredient(this)">
+        <span>🧅</span>
+        Soğan
+      </div>
+
+      <div class="ingredient" data-name="Biber" onclick="selectIngredient(this)">
+        <span>🌶️</span>
+        Biber
+      </div>
+
+      <div class="ingredient" data-name="Pirinç" onclick="selectIngredient(this)">
+        <span>🍚</span>
+        Pirinç
+      </div>
+
+      <div class="ingredient" data-name="Salatalık" onclick="selectIngredient(this)">
+        <span>🥒</span>
+        Salatalık
+      </div>
+
+      <div class="ingredient" data-name="Mercimek" onclick="selectIngredient(this)">
+        <span>🫘</span>
+        Mercimek
+      </div>
+
+      <div class="ingredient" data-name="Fasulye" onclick="selectIngredient(this)">
+        <span>🫘</span>
+        Fasulye
+      </div>
+
+      <div class="ingredient" data-name="Havuç" onclick="selectIngredient(this)">
+        <span>🥕</span>
+        Havuç
+      </div>
+
+      <div class="ingredient" data-name="Bezelye" onclick="selectIngredient(this)">
+        <span>🫛</span>
+        Bezelye
+      </div>
+
+      <div class="ingredient" data-name="Yoğurt" onclick="selectIngredient(this)">
+        <span>🥣</span>
+        Yoğurt
+      </div>
+
+      <div class="ingredient" data-name="Patlıcan" onclick="selectIngredient(this)">
+        <span>🍆</span>
+        Patlıcan
+      </div>
+
+    </div>
+
+    <button onclick="findFoods()">🍽️ Yemekleri Bul</button>
+
+    <button class="clear-button" onclick="clearIngredients()">
+      🗑️ Temizle
+    </button>
+
+  </div>
+
+  <div class="card" id="results">
+
+    <h2>🍽️ Yapabileceğin Yemekler</h2>
+
+    <div class="results-count" id="resultsCount"></div>
+
+    <div class="food-grid" id="foodList"></div>
+
+  </div>
+
+</div>
+
+<footer>
+  ❤️ Ne Yesem? — Afiyet olsun!
+</footer>
+
+<script>
+
+let selectedIngredients = [];
+
+const foods = [
+
+  {
+    name: "Menemen",
+    icon: "🍳",
+    ingredients: ["Yumurta", "Domates", "Biber"],
+    time: "15 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Domatesleri küçük küçük doğra.<br>
+      2. Biberleri tavada pişir.<br>
+      3. Domatesleri ekle ve birkaç dakika pişir.<br>
+      4. Yumurtaları ekle.<br>
+      5. Karıştırarak pişir ve sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Soğanlı Menemen",
+    icon: "🍳",
+    ingredients: ["Yumurta", "Domates", "Biber", "Soğan"],
+    time: "20 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Soğanları doğra ve tavada pişir.<br>
+      2. Biberleri ekle.<br>
+      3. Domatesleri ekleyip pişir.<br>
+      4. Yumurtaları kır.<br>
+      5. Karıştırarak pişir ve sıcak servis et.
+    `
+  },
+
+  {
+    name: "Makarna",
+    icon: "🍝",
+    ingredients: ["Makarna"],
+    time: "15 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Makarnayı tuzlu suda haşla.<br>
+      2. Suyunu süz.<br>
+      3. İsteğe göre sos ekle.<br>
+      4. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Tavuklu Makarna",
+    icon: "🍝",
+    ingredients: ["Makarna", "Tavuk"],
+    time: "25 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Makarnayı haşla.<br>
+      2. Tavuğu küçük parçalara ayırıp pişir.<br>
+      3. Makarnayı tavuğa ekle.<br>
+      4. Karıştırıp servis et. 😋
+    `
+  },
+
+  {
+    name: "Peynirli Makarna",
+    icon: "🍝",
+    ingredients: ["Makarna", "Peynir"],
+    time: "15 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Makarnayı haşla.<br>
+      2. Peyniri rendele.<br>
+      3. Sıcak makarnaya peyniri ekle.<br>
+      4. İyice karıştır.<br>
+      5. Sıcak servis et.
+    `
+  },
+
+  {
+    name: "Sebzeli Makarna",
+    icon: "🍝",
+    ingredients: ["Makarna", "Domates", "Biber", "Soğan"],
+    time: "30 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Makarnayı haşla.<br>
+      2. Soğan ve biberleri doğra.<br>
+      3. Sebzeleri tavada pişir.<br>
+      4. Domatesleri ekle.<br>
+      5. Makarnayı sosa ekle.<br>
+      6. Karıştırıp servis et. 😋
+    `
+  },
+
+  {
+    name: "Tavuklu Patates",
+    icon: "🍗",
+    ingredients: ["Tavuk", "Patates"],
+    time: "35 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Patatesleri küp küp doğra.<br>
+      2. Tavukları küçük parçalara ayır.<br>
+      3. Tavukları tavada pişir.<br>
+      4. Patatesleri ekle.<br>
+      5. İyice pişirip sıcak servis et.
+    `
+  },
+
+  {
+    name: "Haşlanmış Patates",
+    icon: "🥔",
+    ingredients: ["Patates"],
+    time: "25 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Patatesleri güzelce yıka.<br>
+      2. Tencereye koy ve üzerini geçecek kadar su ekle.<br>
+      3. Patatesler yumuşayana kadar haşla.<br>
+      4. Suyunu süz.<br>
+      5. Biraz soğuduktan sonra servis et. 🥔
+    `
+  },
+
+  {
+    name: "Patatesli Yumurta",
+    icon: "🥔",
+    ingredients: ["Patates", "Yumurta"],
+    time: "20 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Patatesleri küçük küpler halinde doğra.<br>
+      2. Tavada pişir.<br>
+      3. Yumurtaları üzerine kır.<br>
+      4. Yumurtalar pişene kadar bekle.<br>
+      5. Sıcak servis et.
+    `
+  },
+
+  {
+    name: "Peynirli Omlet",
+    icon: "🍳",
+    ingredients: ["Yumurta", "Peynir"],
+    time: "10 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Yumurtaları bir kapta çırp.<br>
+      2. Tavaya dök.<br>
+      3. Peyniri üzerine ekle.<br>
+      4. Omleti ikiye katla.<br>
+      5. Pişince servis et.
+    `
+  },
+
+  {
+    name: "Omlet",
+    icon: "🍳",
+    ingredients: ["Yumurta"],
+    time: "10 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Yumurtaları bir kapta çırp.<br>
+      2. Tavaya dök.<br>
+      3. İki tarafını da pişir.<br>
+      4. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Karışık Omlet",
+    icon: "🍳",
+    ingredients: ["Yumurta", "Peynir", "Domates", "Biber"],
+    time: "20 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Domates ve biberleri doğra.<br>
+      2. Tavada sebzeleri pişir.<br>
+      3. Yumurtaları çırpıp ekle.<br>
+      4. Peyniri üzerine ekle.<br>
+      5. Omlet pişince servis et.
+    `
+  },
+
+  {
+    name: "Sebzeli Tavuk",
+    icon: "🍗",
+    ingredients: ["Tavuk", "Domates", "Biber", "Soğan"],
+    time: "35 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Tavukları küçük parçalara ayır.<br>
+      2. Tavukları tavada pişir.<br>
+      3. Soğan ve biberleri ekle.<br>
+      4. Domatesleri ekleyip pişirmeye devam et.<br>
+      5. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Tavuk Sote",
+    icon: "🍗",
+    ingredients: ["Tavuk", "Domates", "Biber", "Soğan"],
+    time: "30 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Tavukları küçük parçalar halinde doğra.<br>
+      2. Tavukları tavada pişir.<br>
+      3. Soğan ve biberleri ekle.<br>
+      4. Domatesleri ekleyip birlikte pişir.<br>
+      5. Tuz ve baharatları ekle.<br>
+      6. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Karışık Patates Tava",
+    icon: "🥔",
+    ingredients: ["Patates", "Domates", "Biber", "Soğan"],
+    time: "30 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Patatesleri küp küp doğra.<br>
+      2. Soğan ve biberleri doğra.<br>
+      3. Patatesleri tavada pişir.<br>
+      4. Soğan ve biberleri ekle.<br>
+      5. Domatesleri ekleyip birlikte pişir.<br>
+      6. Sıcak servis et.
+    `
+  },
+
+  {
+    name: "Pilav",
+    icon: "🍚",
+    ingredients: ["Pirinç"],
+    time: "25 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Pirinci güzelce yıka.<br>
+      2. Tencereye pirinci ve suyunu ekle.<br>
+      3. Pirinçler yumuşayana kadar pişir.<br>
+      4. Birkaç dakika dinlendir.<br>
+      5. Servis et. 😋
+    `
+  },
+
+  {
+    name: "Tavuklu Pilav",
+    icon: "🍗",
+    ingredients: ["Pirinç", "Tavuk"],
+    time: "35 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Pirinci yıka.<br>
+      2. Tavukları küçük parçalara ayır.<br>
+      3. Tavukları pişir.<br>
+      4. Pirinci ekle.<br>
+      5. Birlikte pişir.<br>
+      6. Dinlendirip servis et. 😋
+    `
+  },
+
+  {
+    name: "Sebzeli Pilav",
+    icon: "🍚",
+    ingredients: ["Pirinç", "Biber", "Soğan", "Domates"],
+    time: "30 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Soğan ve biberleri doğra.<br>
+      2. Sebzeleri pişir.<br>
+      3. Domatesleri ekle.<br>
+      4. Pirinci ekle.<br>
+      5. Suyunu ekleyip pişir.<br>
+      6. Dinlendirip servis et. 😋
+    `
+  },
+
+  {
+    name: "Mercimekli Pilav",
+    icon: "🍚",
+    ingredients: ["Mercimek", "Pirinç"],
+    time: "35 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Mercimeği yıka ve haşla.<br>
+      2. Pirinci yıka.<br>
+      3. Pirinci pişirmeye başla.<br>
+      4. Mercimeği ekle.<br>
+      5. Birlikte pişir.<br>
+      6. Dinlendirip servis et. 😋
+    `
+  },
+
+  {
+    name: "Çoban Salatası",
+    icon: "🥗",
+    ingredients: ["Salatalık", "Domates", "Biber", "Soğan"],
+    time: "10 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Salatalıkları doğra.<br>
+      2. Domatesleri doğra.<br>
+      3. Biberleri ve soğanı doğra.<br>
+      4. Tüm malzemeleri karıştır.<br>
+      5. Servis et. 🥗
+    `
+  },
+
+  {
+    name: "Biber Salatası",
+    icon: "🌶️",
+    ingredients: ["Biber", "Domates", "Soğan"],
+    time: "10 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Biberleri doğra.<br>
+      2. Domatesleri doğra.<br>
+      3. Soğanı ince ince doğra.<br>
+      4. Tüm malzemeleri karıştır.<br>
+      5. Servis et. 🌶️
+    `
+  },
+
+  {
+    name: "Domates Çorbası",
+    icon: "🍅",
+    ingredients: ["Domates"],
+    time: "25 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Domatesleri doğra.<br>
+      2. Tencereye domatesleri koyup pişir.<br>
+      3. Uygun miktarda su ekle.<br>
+      4. Bir süre kaynat.<br>
+      5. Çorbayı pürüzsüz hale getir.<br>
+      6. Sıcak servis et. 🍅
+    `
+  },
+
+  {
+    name: "Tavuk Çorbası",
+    icon: "🍗",
+    ingredients: ["Tavuk", "Soğan"],
+    time: "35 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Tavukları küçük parçalara ayır.<br>
+      2. Soğanı doğra.<br>
+      3. Tavuk ve soğanı tencereye koy.<br>
+      4. Su ekleyip pişir.<br>
+      5. Tavuk tamamen pişince servis et. 🍗
+    `
+  },
+
+  {
+    name: "Pirinç Çorbası",
+    icon: "🍚",
+    ingredients: ["Pirinç", "Domates", "Soğan"],
+    time: "30 dakika",
+    rating: "4.7",
+    recipe: `
+      1. Soğanı doğrayıp pişir.<br>
+      2. Domatesleri ekle.<br>
+      3. Pirinci yıkayıp ekle.<br>
+      4. Su ekle.<br>
+      5. Pirinçler yumuşayana kadar pişir.<br>
+      6. Sıcak servis et. 🍚
+    `
+  },
+
+  {
+    name: "Sebze Çorbası",
+    icon: "🥕",
+    ingredients: ["Patates", "Domates", "Biber", "Soğan"],
+    time: "35 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Patatesleri doğra.<br>
+      2. Soğan ve biberleri doğra.<br>
+      3. Domatesleri doğra.<br>
+      4. Tüm sebzeleri tencereye koy.<br>
+      5. Su ekleyip sebzeler yumuşayana kadar pişir.<br>
+      6. Sıcak servis et. 🥕
+    `
+  },
+
+  {
+    name: "Mercimek Çorbası",
+    icon: "🥣",
+    ingredients: ["Mercimek"],
+    time: "35 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Mercimeği güzelce yıka.<br>
+      2. Tencereye mercimeği koy.<br>
+      3. Üzerine yeterli miktarda su ekle.<br>
+      4. Mercimekler tamamen yumuşayana kadar pişir.<br>
+      5. Çorbayı pürüzsüz hale getir.<br>
+      6. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Yoğurtlu Çorba",
+    icon: "🥣",
+    ingredients: ["Yoğurt", "Pirinç"],
+    time: "30 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Pirinci yıka ve suyla birlikte pişir.<br>
+      2. Yoğurdu ayrı bir kapta karıştır.<br>
+      3. Yoğurdu yavaşça çorbaya ekle.<br>
+      4. Karıştırarak pişirmeye devam et.<br>
+      5. Çorba kıvam alınca sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Kuru Fasulye",
+    icon: "🫘",
+    ingredients: ["Fasulye", "Soğan", "Domates"],
+    time: "45 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Fasulyeleri hazırlayıp pişirmeye başla.<br>
+      2. Soğanları doğrayıp pişir.<br>
+      3. Domatesleri ekle.<br>
+      4. Fasulyeleri ekleyip birlikte pişir.<br>
+      5. İyice pişince sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Taze Fasulye",
+    icon: "🫛",
+    ingredients: ["Fasulye", "Domates", "Soğan"],
+    time: "40 dakika",
+    rating: "4.8",
+    recipe: `
+      1. Taze fasulyeleri temizleyip doğra.<br>
+      2. Soğanları doğrayıp pişir.<br>
+      3. Domatesleri ekle.<br>
+      4. Fasulyeleri ekleyip karıştır.<br>
+      5. Fasulyeler yumuşayana kadar pişir.<br>
+      6. Sıcak servis et. 😋
+    `
+  },
+
+  {
+    name: "Patlıcan Yemeği",
+    icon: "🍆",
+    ingredients: ["Patlıcan", "Domates", "Soğan"],
+    time: "40 dakika",
+    rating: "4.9",
+    recipe: `
+      1. Patlıcanları doğra.<br>
+      2. Soğanları doğrayıp pişir.<br>
+      3. Domatesleri ekle.<br>
+      4. Patlıcanları tencereye ekle.<br>
+      5. Bir miktar su ekleyip patlıcanlar yumuşayana kadar pişir.<br>
+      6. Sıcak servis et. 😋
+    `
+  }
+
+];
+
+
+function selectIngredient(element) {
+
+  element.classList.toggle("selected");
+
+  const name = element.dataset.name;
+
+  if (selectedIngredients.includes(name)) {
+
+    selectedIngredients =
+      selectedIngredients.filter(item => item !== name);
+
+  } else {
+
+    selectedIngredients.push(name);
+
+  }
+
+}
+
+
+function findFoods() {
+
+  if (selectedIngredients.length === 0) {
+
+    alert("Önce evinde bulunan en az bir malzemeyi seç! 🥕");
+
+    return;
+  }
+
+  const possibleFoods = foods.filter(food =>
+    food.ingredients.every(ingredient =>
+      selectedIngredients.includes(ingredient)
+    )
+  );
+
+  const results =
+    document.getElementById("results");
+
+  const foodList =
+    document.getElementById("foodList");
+
+  const resultsCount =
+    document.getElementById("resultsCount");
+
+  results.style.display = "block";
+
+  if (possibleFoods.length === 0) {
+
+    resultsCount.textContent = "";
+
+    foodList.innerHTML = `
+      <div class="no-result">
+        😢 Bu malzemelerle kayıtlı bir yemek bulamadık.
+        <br><br>
+        Daha fazla malzeme seçmeyi deneyebilirsin!
+      </div>
+    `;
+
+  } else {
+
+    resultsCount.innerHTML = `
+      🎉 Seçtiğin malzemelerle
+      <strong>${possibleFoods.length}</strong>
+      farklı yemek yapabilirsin!
+    `;
+
+    foodList.innerHTML = possibleFoods.map((food, index) => `
+
+      <div class="food-card">
+
+        <div class="food-icon">
+          ${food.icon}
+        </div>
+
+        <div class="food-name">
+          ${food.name}
+        </div>
+
+        <div class="food-info">
+          ⏱️ ${food.time}
+          &nbsp;&nbsp;
+          ⭐ ${food.rating}/5
+        </div>
+
+        <div class="food-ingredients">
+
+          <strong>🥕 Gerekli malzemeler:</strong>
+
+          <br>
+
+          ${food.ingredients.join(" • ")}
+
+        </div>
+
+        <button
+          class="show-recipe"
+          onclick="toggleRecipe(${index})"
+        >
+          📖 Tarifi Göster
+        </button>
+
+        <div
+          class="recipe"
+          id="recipe-${index}"
+        >
+
+          <strong>👨‍🍳 Yapılışı:</strong>
+
+          <br><br>
+
+          ${food.recipe}
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+  }
+
+  results.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+}
+
+
+function toggleRecipe(index) {
+
+  const recipe =
+    document.getElementById(`recipe-${index}`);
+
+  const button =
+    recipe.previousElementSibling;
+
+  if (recipe.style.display === "block") {
+
+    recipe.style.display = "none";
+
+    button.textContent = "📖 Tarifi Göster";
+
+  } else {
+
+    recipe.style.display = "block";
+
+    button.textContent = "📕 Tarifi Gizle";
+
+  }
+
+}
+
+
+function clearIngredients() {
+
+  selectedIngredients = [];
+
+  document
+    .querySelectorAll(".ingredient")
+    .forEach(element => {
+
+      element.classList.remove("selected");
+
+    });
+
+  document.getElementById("results").style.display = "none";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+</script>
+
+</body>
+</html>
